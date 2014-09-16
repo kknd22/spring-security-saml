@@ -110,7 +110,18 @@
         <property name="idpSelectionPath" value="/WEB-INF/security/idpSelection.jsp"/>
     </bean>
 
-    <!-- Filter automatically generates default SP metadata -->
+    <bean id="metadataGeneratorFilter" class="org.springframework.security.saml.metadata.MetadataGeneratorFilter">
+        <constructor-arg>
+            <bean class="org.springframework.security.saml.metadata.MetadataGenerator">
+                <property name="entityId" value="http://kk.ssocircle.com"/>
+                <property name="wantAssertionSigned" value="false"/>
+                <property name="requestSigned" value="false"/>
+                <!--<property name="signMetadata" value="false"/>-->
+            </bean>
+        </constructor-arg>
+    </bean>
+<!--
+    &lt;!&ndash; Filter automatically generates default SP metadata &ndash;&gt;
     <bean id="metadataGeneratorFilter" class="org.springframework.security.saml.metadata.MetadataGeneratorFilter">
         <constructor-arg>
             <bean class="org.springframework.security.saml.metadata.MetadataGenerator">
@@ -122,15 +133,33 @@
             </bean>
         </constructor-arg>
     </bean>
+-->
 
     <!-- The filter is waiting for connections on URL suffixed with filterSuffix and presents SP metadata there -->
     <bean id="metadataDisplayFilter" class="org.springframework.security.saml.metadata.MetadataDisplayFilter"/>
 
-    <!-- IDP Metadata configuration - paths to metadata of IDPs in circle of trust is here -->
     <bean id="metadata" class="org.springframework.security.saml.metadata.CachingMetadataManager">
         <constructor-arg>
             <list>
-                <!-- Example of classpath metadata with Extended Metadata -->
+                <bean class="org.opensaml.saml2.metadata.provider.HTTPMetadataProvider">
+                    <constructor-arg>
+                        <value type="java.lang.String">http://idp.ssocircle.com/idp-meta.xml</value>
+                    </constructor-arg>
+                    <constructor-arg>
+                        <value type="int">5000</value>
+                    </constructor-arg>
+                    <property name="parserPool" ref="parserPool"/>
+                </bean>
+            </list>
+        </constructor-arg>
+    </bean>
+
+    <!-- IDP Metadata configuration - paths to metadata of IDPs in circle of trust is here -->
+<!--
+    <bean id="metadata" class="org.springframework.security.saml.metadata.CachingMetadataManager">
+        <constructor-arg>
+            <list>
+                &lt;!&ndash; Example of classpath metadata with Extended Metadata &ndash;&gt;
                 <bean class="org.springframework.security.saml.metadata.ExtendedMetadataDelegate">
                     <constructor-arg>
                         <bean class="org.opensaml.saml2.metadata.provider.ResourceBackedMetadataProvider">
@@ -150,34 +179,35 @@
                         </bean>
                     </constructor-arg>
                 </bean>
-                <!-- Example of HTTP metadata without Extended Metadata -->
+                &lt;!&ndash; Example of HTTP metadata without Extended Metadata &ndash;&gt;
                 <bean class="org.opensaml.saml2.metadata.provider.HTTPMetadataProvider">
-                    <!-- URL containing the metadata -->
+                    &lt;!&ndash; URL containing the metadata &ndash;&gt;
                     <constructor-arg>
                         <value type="java.lang.String">http://idp.ssocircle.com/idp-meta.xml</value>
                     </constructor-arg>
-                    <!-- Timeout for metadata loading in ms -->
+                    &lt;!&ndash; Timeout for metadata loading in ms &ndash;&gt;
                     <constructor-arg>
                         <value type="int">15000</value>
                     </constructor-arg>
                     <property name="parserPool" ref="parserPool"/>
                 </bean>
-                <!-- Example of file system metadata without Extended Metadata -->
-                <!--
+                &lt;!&ndash; Example of file system metadata without Extended Metadata &ndash;&gt;
+                &lt;!&ndash;
                 <bean class="org.opensaml.saml2.metadata.provider.FilesystemMetadataProvider">
                     <constructor-arg>
                         <value type="java.io.File">/usr/local/metadata/idp.xml</value>
                     </constructor-arg>
                     <property name="parserPool" ref="parserPool"/>
                 </bean>
-                -->
+                &ndash;&gt;
             </list>
         </constructor-arg>
-        <!-- OPTIONAL used when one of the metadata files contains information about this service provider -->
-        <!-- <property name="hostedSPName" value=""/> -->
-        <!-- OPTIONAL property: can tell the system which IDP should be used for authenticating user by default. -->
-        <!-- <property name="defaultIDP" value="http://localhost:8080/opensso"/> -->
+        &lt;!&ndash; OPTIONAL used when one of the metadata files contains information about this service provider &ndash;&gt;
+        &lt;!&ndash; <property name="hostedSPName" value=""/> &ndash;&gt;
+        &lt;!&ndash; OPTIONAL property: can tell the system which IDP should be used for authenticating user by default. &ndash;&gt;
+        &lt;!&ndash; <property name="defaultIDP" value="http://localhost:8080/opensso"/> &ndash;&gt;
     </bean>
+-->
 
     <!-- SAML Authentication Provider responsible for validating of received SAML messages -->
     <bean id="samlAuthenticationProvider" class="org.springframework.security.saml.SAMLAuthenticationProvider">
